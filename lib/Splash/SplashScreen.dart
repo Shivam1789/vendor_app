@@ -1,5 +1,4 @@
 import 'dart:async';
-//import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unique_id/unique_id.dart';
 import 'package:vendor_flutter/LogIn/sliding_login.dart';
+import 'package:vendor_flutter/NavigationDrawer/home.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
 import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
@@ -153,11 +153,10 @@ class _SplashScreenState extends State<SplashScreen>
           (Route<dynamic> route) => false);
     } else {
       //await loadUser();
-
-//      Navigator.pushAndRemoveUntil(
-//          context,
-//          CupertinoPageRoute(builder: (context) => new DrawerMain()),
-//          (Route<dynamic> route) => false);
+      Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(builder: (context) => new HomeScreen()),
+              (Route<dynamic> route) => false);
     }
   }
 

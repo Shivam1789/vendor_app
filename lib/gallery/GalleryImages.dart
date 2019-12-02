@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:vendor_flutter/Utils/AppColors.dart';
+import 'package:vendor_flutter/bloc/gallery_bloc.dart';
 
 class GalleryImages extends StatefulWidget {
   @override
@@ -7,11 +9,34 @@ class GalleryImages extends StatefulWidget {
 }
 
 class _GalleryImagesState extends State<GalleryImages> {
+  GalleryBloc _loanBloc = new GalleryBloc();
+
+  @override
+  void initState() {
+    super.initState();
+    _loanBloc.getImagesList(context);
+
+    _loanBloc.isLoading.add(false);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: gridView,
+        child: Column(
+          children: <Widget>[
+            SizedBox(height: 20,),
+            new OutlineButton(
+                child: new Text("Upload Image"),
+                onPressed: (){},
+                highlightedBorderColor: AppColors.kGreen,
+                shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0),)
+            ),
+            SizedBox(height: 20,),
+            Expanded(child: gridView),
+          ],
+        ),
       ),
     );
   }

@@ -36,6 +36,8 @@ dependencies:
   provider: ^2.0.0
   gradient_app_bar: ^0.0.1
   dio: ^3.0.7
+  rxdart: ^0.22.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
