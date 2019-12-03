@@ -1,10 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:vendor_flutter/NavigationDrawer/home.dart';
 import 'package:vendor_flutter/Utils/Messages.dart';
 import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
-import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
 import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/data/ImageList.dart';
@@ -72,6 +76,7 @@ class GalleryBloc extends BaseBloc {
     }
   }
 
+
   //method load Loan items to List
   _loadData(resultList,{currentPage}) {
     if(currentPage==1){
@@ -80,7 +85,6 @@ class GalleryBloc extends BaseBloc {
     for (Map map in resultList) {
       loanList.add(ImageList.fromJson(map));
     }
-
   }
 
   @override
@@ -88,5 +92,39 @@ class GalleryBloc extends BaseBloc {
     viewController.close();
     isLoading.close();
     return null;
+  }
+
+
+
+  uploadImage(File imageFile) async {
+    String baseUrl = "http://gk3.puneetchawla.in/api/v1/image?token=${MemoryManagement
+        .getAccessToken()}";
+    print(baseUrl);
+    // open a bytestream
+    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    // get file length
+    var length = await imageFile.length();
+
+    // string to uri
+    var uri = Uri.parse(baseUrl);
+
+    // create multipart request
+    var request = new http.MultipartRequest("POST", uri);
+
+    // multipart that takes file
+    var multipartFile = new http.MultipartFile('file', stream, length,
+        filename: basename(imageFile.path));
+
+    // add file to multipart
+    request.files.add(multipartFile);
+
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+    // listen for response
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
   }
 }

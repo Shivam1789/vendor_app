@@ -1,3 +1,5 @@
+import 'package:vendor_flutter/Utils/memory_management.dart';
+
 class ApiUrl {
   //  local Url
 
@@ -26,7 +28,7 @@ class ApiUrl {
 
   //Loan
   static const String addLoanRequest = "$baseUrl" + "loan";
-  static const String getMyLoanREQList = "$baseUrl" + "loan";
+  static const String getMyLoanREQList = "$baseUrl" + "image";
   static const String getReadyToChatList = "$baseUrl" + "loan/chat";
 
   //CMS

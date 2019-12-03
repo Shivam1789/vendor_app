@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:vendor_flutter/Utils/memory_management.dart';
 
 import 'api_handler.dart';
 import 'api_urls.dart';
@@ -62,7 +63,8 @@ class ApiManager {
     @required Map<String, String> header,
     @required Map<String, dynamic> body,pageNumber:1}) async {
     return await ApiHandler.hit(context: context,
-        url: ApiUrl.getMyLoanREQList+"/$pageNumber",
+        url: "${ApiUrl.getMyLoanREQList}?token=${MemoryManagement
+            .getAccessToken()} ",
         type: apiType.get,
         header: header,
         body: body);
