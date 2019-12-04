@@ -144,7 +144,7 @@ class HomePageState extends State<HomePage>
             onFieldSubmitted: (val) {
               setFocusNode(context: context, focusNode: _passwordFocusNode);
             },
-            textCapitalization: TextCapitalization.words,
+            textCapitalization: TextCapitalization.none,
           ),
           Padding(
               padding: const EdgeInsets.only(top: 16),

@@ -39,7 +39,7 @@ class LoginBloc extends BaseBloc {
       String token = "${result['token']}";
       print("bloc Staus:$token");
 
-      if (token != null) {
+      if (token != null && token.isNotEmpty) {
         await MemoryManagement.init();
         MemoryManagement.setAccessToken(accessToken: token);
         _customLoader.hideLoader();

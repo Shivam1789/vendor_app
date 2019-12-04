@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:vendor_flutter/LogIn/sliding_login.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
 import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
+import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/createSale/createSale.dart';
 import 'package:vendor_flutter/gallery/GalleryImages.dart';
 
@@ -76,6 +79,19 @@ class HomeScreenState extends State<HomeScreen> {
                     _activeScreen = ActiveScreen.PaymentHistory;
                     setState(() {});
                     Navigator.of(context).pop();
+                  }),
+              _createDrawerItem(
+                  icon: Icons.lightbulb_outline,
+                  text: 'Logout',
+                  onTap: ()async {
+                    _activeScreen = ActiveScreen.logout;
+                    setState(() {});
+                    Navigator.of(context).pop();
+                    MemoryManagement.clearMemory();
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        CupertinoPageRoute(builder: (context) => new LoginScreen()),
+                            (Route<dynamic> route) => false);
                   })
             ],
           ),

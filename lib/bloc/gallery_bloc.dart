@@ -131,7 +131,8 @@ class GalleryBloc extends BaseBloc {
 //  }
 
 
-  Future<http.StreamedResponse> uploadImage(_image) async {
+  Future<http.StreamedResponse> uploadImage(_image,
+      BuildContext context) async {
     print("UPLOADING IMAGE");
     String baseUrl = "http://gk3.puneetchawla.in/api/v1/image?token=${MemoryManagement
         .getAccessToken()}";
@@ -162,6 +163,10 @@ class GalleryBloc extends BaseBloc {
     http.StreamedResponse response = await request.send();
     print("UPLOADED");
     print("STATUS CODE: ${response.statusCode}");
+    showAlertDialog(
+        context: context,
+        title: "Information",
+        message: "Image uploaded succesfully.");
     return response;
   }
 }
