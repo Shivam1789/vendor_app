@@ -1,14 +1,20 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
 import 'package:vendor_flutter/Utils/Messages.dart';
 import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
+import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
+import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/bloc/gallery_bloc.dart';
 import 'package:vendor_flutter/data/ImageList.dart';
+import 'package:vendor_flutter/networks/api_manager.dart';
+import 'package:vendor_flutter/networks/api_urls.dart';
 
 class GalleryImages extends StatefulWidget {
   @override
@@ -19,12 +25,12 @@ class _GalleryImagesState extends State<GalleryImages> {
   GalleryBloc _galleryBloc = new GalleryBloc();
   File _image;
   ScrollController _scrollController = new ScrollController();
+  Future<List<ImageList>> imagesList;
 
   @override
   void initState() {
     super.initState();
-    _galleryBloc.getImagesList(context);
-    _galleryBloc.isLoading.add(false);
+    imagesList=fetchProducts();
   }
 
 
@@ -44,37 +50,17 @@ class _GalleryImagesState extends State<GalleryImages> {
                 shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0),)
             ),
             SizedBox(height: 20,),
-            Expanded(child: StreamBuilder<int>(
-              stream: _galleryBloc.viewController.stream,
-              // a Stream<int> or null
-              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return CustomLoader().buildLoader(isTransparent: true);
-                    break;
-                  case ConnectionState.active:
-                  case ConnectionState.done:
-                    int result = snapshot.data;
-                    switch (result) {
-                      case -1:
-                        return CustomLoader().buildLoader(isTransparent: true);
-                        break;
-                      case 1:
-                        return _buildPage();
-                        break;
-                      case 0:
-                        return getRetryView(
-                            context: context,
-                            message: AppMessages.unableToLoadData,
-                            onRetry: () {
-                              _galleryBloc.viewController.add(-1);
-                              _galleryBloc.getImagesList(context);
-                            });
-                    }
+            Expanded(child: FutureBuilder<List<ImageList>>(
+              future: imagesList,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return getGridView(images: snapshot.data);
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
                 }
-                return null; // unreachable
+
+                // By default, show a loading spinner.
+                return CircularProgressIndicator();
               },
             ))
           ],
@@ -84,7 +70,7 @@ class _GalleryImagesState extends State<GalleryImages> {
   }
 
 
-  Widget getGridView({ImageList loan, index}) {
+  Widget getGridView({List<ImageList> images, index}) {
     return new GridView.builder(
         itemCount: 20,
         gridDelegate:
@@ -123,47 +109,47 @@ class _GalleryImagesState extends State<GalleryImages> {
   }
 
 
-  _buildPage() {
-    return (GalleryBloc.loanList?.length ?? 0) == 0
-        ? _getNoItemView()
-        : Column(children: [
-      Flexible(
-        child: RefreshIndicator(
-          child: ListView.builder(
-              padding: EdgeInsets.only(bottom: 40, top: 15.0),
-              //all list padding
-              controller: _scrollController,
-              physics: AlwaysScrollableScrollPhysics(),
-
-              itemCount: GalleryBloc.loanList.length + 1,
-              itemBuilder: (context, i) {
-                return (i == (GalleryBloc.loanList.length))
-                    ? StreamBuilder<bool>(
-                  initialData: false,
-                  stream: _galleryBloc.isLoading.stream,
-                  builder: (context, snapsot) {
-                    print("snpashot:${snapsot.data}");
-                    return Offstage(
-                      offstage: !snapsot.data ?? true,
-                      child: Center(
-                          child: CupertinoActivityIndicator(
-                            radius: 15,
-                          )),
-                    );
-                  },
-                )
-                    : getGridView(loan: GalleryBloc.loanList[i], index: i);
-              }),
-          onRefresh: () async {
-            _galleryBloc.currentPage = 1;
-            print("Current Page ${_galleryBloc.currentPage}");
-            await _galleryBloc.getImagesList(context);
-            return;
-          },
-        ),
-      ),
-    ]);
-  }
+//  _buildPage() {
+//    return (GalleryBloc.loanList?.length ?? 0) == 0
+//        ? _getNoItemView()
+//        : Column(children: [
+//      Flexible(
+//        child: RefreshIndicator(
+//          child: ListView.builder(
+//              padding: EdgeInsets.only(bottom: 40, top: 15.0),
+//              //all list padding
+//              controller: _scrollController,
+//              physics: AlwaysScrollableScrollPhysics(),
+//
+//              itemCount: GalleryBloc.loanList.length + 1,
+//              itemBuilder: (context, i) {
+//                return (i == (GalleryBloc.loanList.length))
+//                    ? StreamBuilder<bool>(
+//                  initialData: false,
+//                  stream: _galleryBloc.isLoading.stream,
+//                  builder: (context, snapsot) {
+//                    print("snpashot:${snapsot.data}");
+//                    return Offstage(
+//                      offstage: !snapsot.data ?? true,
+//                      child: Center(
+//                          child: CupertinoActivityIndicator(
+//                            radius: 15,
+//                          )),
+//                    );
+//                  },
+//                )
+//                    : getGridView(loan: GalleryBloc.loanList[i], index: i);
+//              }),
+//          onRefresh: () async {
+//            _galleryBloc.currentPage = 1;
+//            print("Current Page ${_galleryBloc.currentPage}");
+//            await _galleryBloc.getImagesList(context);
+//            return;
+//          },
+//        ),
+//      ),
+//    ]);
+//  }
 
   _getNoItemView() {
     return getRetryView(
@@ -182,4 +168,46 @@ class _GalleryImagesState extends State<GalleryImages> {
     });
     _galleryBloc.uploadImage(_image);
   }
+
+
+  getImagesList(context) async {
+    bool isConnected = await isConnectedToInternet();
+    if (!isConnected ?? true) {
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: AppMessages.noInternetError);
+      return;
+    }
+
+    try {
+      var result =
+      await ApiManager.getLoanList(
+          header: {}, body: {}, context: context, pageNumber: 1);
+      print("Result:$result");
+    } catch (e, st) {
+      print("Exception :: $e\n $st");
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: "${AppMessages.generalError}");
+    }
+  }
+
+  List<ImageList> parseProducts(String responseBody) {
+    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+    return parsed.map<ImageList>((json) => ImageList.fromJson(json)).toList();
+  }
+
+  Future<List<ImageList>> fetchProducts() async {
+    final response = await http.get(
+        "${ApiUrl.getMyLoanREQList}?token=${MemoryManagement
+            .getAccessToken()}");
+    if (response.statusCode == 200) {
+      return parseProducts(response.body);
+    } else {
+      throw Exception('Unable to fetch products from the REST API');
+    }
+  }
+
 }

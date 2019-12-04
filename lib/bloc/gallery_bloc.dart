@@ -1,7 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -95,36 +91,77 @@ class GalleryBloc extends BaseBloc {
   }
 
 
+//  uploadImage(File imageFile) async {
+//    String baseUrl = "http://gk3.puneetchawla.in/api/v1/image";
+//    Map<String, String> headers = {
+//      "Content-Type": "multipart/form-data",
+//      "Token": MemoryManagement
+//          .getAccessToken() ?? "",
+//      "Accept": "application/json"
+//    };
+//    print(baseUrl);
+//    // open a bytestream
+//    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+//    // get file length
+//    var length = await imageFile.length();
+//
+//    // string to uri
+//    var uri = Uri.parse(baseUrl);
+//
+//    // create multipart request
+//    var request = new http.MultipartRequest("POST", uri);
+//
+//    request.headers.addAll(headers);
+//
+//    // multipart that takes file
+//    var multipartFile = new http.MultipartFile('file', stream, length,
+//        filename: basename(imageFile.path));
+//
+//    // add file to multipart
+//    request.files.add(multipartFile);
+//
+//    // send
+//    var response = await request.send();
+//    print(response.statusCode);
+//
+//    // listen for response
+//    response.stream.transform(utf8.decoder).listen((value) {
+//      print(value);
+//    });
+//  }
 
-  uploadImage(File imageFile) async {
+
+  Future<http.StreamedResponse> uploadImage(_image) async {
+    print("UPLOADING IMAGE");
     String baseUrl = "http://gk3.puneetchawla.in/api/v1/image?token=${MemoryManagement
         .getAccessToken()}";
-    print(baseUrl);
-    // open a bytestream
-    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
-    // get file length
-    var length = await imageFile.length();
+    var url = Uri.parse(baseUrl); //get url
+    String token = MemoryManagement
+        .getAccessToken();
 
-    // string to uri
-    var uri = Uri.parse(baseUrl);
+    Map<String, String> headers = {
+//header
+      "Content-Type": "multipart/form-data",
+      "Token": token ?? "",
+      "Accept": "application/json"
+    };
 
-    // create multipart request
-    var request = new http.MultipartRequest("POST", uri);
+    http.MultipartRequest request =
+    new http.MultipartRequest("POST", url); //changed
 
-    // multipart that takes file
-    var multipartFile = new http.MultipartFile('file', stream, length,
-        filename: basename(imageFile.path));
+    request.headers.addAll(headers);
+    final fileName = basename(_image.path);
+    var bytes = await _image.readAsBytes();
 
-    // add file to multipart
-    request.files.add(multipartFile);
-
-    // send
-    var response = await request.send();
-    print(response.statusCode);
-
-    // listen for response
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
+    request.files.add(new http.MultipartFile.fromBytes(
+      "image",
+      bytes,
+      filename: fileName,
+    ));
+    print("UPLOADING");
+    http.StreamedResponse response = await request.send();
+    print("UPLOADED");
+    print("STATUS CODE: ${response.statusCode}");
+    return response;
   }
 }
