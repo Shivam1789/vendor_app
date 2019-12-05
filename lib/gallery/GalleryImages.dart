@@ -179,10 +179,10 @@ class _GalleryImagesState extends State<GalleryImages> {
       fetchImages();
     } else {
       _customLoader.hideLoader();
-//      setState(() {
-//        isLoading = false;
-//      });
-//      throw Exception('Failed to load post');
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: "${AppMessages.generalError}");
     }
   }
 
