@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +13,14 @@ class MemoryManagement {
 
   static void setAccessToken({@required String accessToken}) {
     prefs.setString(SharedPrefsKeys.ACCESS_TOKEN, accessToken);
+  }
+
+  static void setName({@required String name}) {
+    prefs.setString(SharedPrefsKeys.NAME, name);
+  }
+
+  static String getName() {
+    return prefs.getString(SharedPrefsKeys.NAME);
   }
 
   static String getAccessToken() {
