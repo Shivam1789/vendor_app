@@ -35,11 +35,14 @@ class LoginBloc extends BaseBloc {
     try {
       var result =
           await ApiManager.login(header: {}, body: body, context: context);
-
-      String token = "${result['token']}";
+      print("result :$result");
+      String token = result != null ? "${result['token'] ?? ""}" : "";
       print("bloc Staus:$token");
-
-      if (token != null && token.isNotEmpty) {
+      int status = int.tryParse("${result['status']}");
+      print("status $status");
+      String msg = result['message'];
+      print(msg);
+      if (token.isNotEmpty) {
         await MemoryManagement.init();
         MemoryManagement.setAccessToken(accessToken: token);
         _customLoader.hideLoader();
