@@ -89,47 +89,7 @@ class GalleryBloc extends BaseBloc {
     isLoading.close();
     return null;
   }
-
-
-//  uploadImage(File imageFile) async {
-//    String baseUrl = "http://gk3.puneetchawla.in/api/v1/image";
-//    Map<String, String> headers = {
-//      "Content-Type": "multipart/form-data",
-//      "Token": MemoryManagement
-//          .getAccessToken() ?? "",
-//      "Accept": "application/json"
-//    };
-//    print(baseUrl);
-//    // open a bytestream
-//    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
-//    // get file length
-//    var length = await imageFile.length();
-//
-//    // string to uri
-//    var uri = Uri.parse(baseUrl);
-//
-//    // create multipart request
-//    var request = new http.MultipartRequest("POST", uri);
-//
-//    request.headers.addAll(headers);
-//
-//    // multipart that takes file
-//    var multipartFile = new http.MultipartFile('file', stream, length,
-//        filename: basename(imageFile.path));
-//
-//    // add file to multipart
-//    request.files.add(multipartFile);
-//
-//    // send
-//    var response = await request.send();
-//    print(response.statusCode);
-//
-//    // listen for response
-//    response.stream.transform(utf8.decoder).listen((value) {
-//      print(value);
-//    });
-//  }
-
+  
 
   Future<http.StreamedResponse> uploadImage(_image) async {
     print("UPLOADING IMAGE");
