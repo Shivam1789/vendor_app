@@ -18,9 +18,4 @@ Future<void> main() async {
       home: SplashScreen(), //Dashboard(),
     ),
   );
-
-/*  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: HomeScreen(), // route for home is '/' implicitly
-  ));*/
 }
