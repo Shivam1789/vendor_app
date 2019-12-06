@@ -60,9 +60,6 @@ class ApiHandler {
               .timeout(_timeoutDuration);
           break;
       }
-    } on TimeoutException {
-      print("Connection Timeout ");
-      return NetworkError(status: "0", message: AppMessages.timeoutError).toJson();
     } catch (e) {
       print("Exceptioin ::$e");
       return NetworkError(status: "0", message: AppMessages.generalError).toJson();
@@ -88,7 +85,7 @@ class ApiHandler {
         await showAlertDialog(
             context: context,
             title: "Error",
-            message: AppMessages.unauthorizedError);
+            message: "Invalid credentials.");
 //        await logout(context);
         break;
       default:

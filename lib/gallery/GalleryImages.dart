@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
+import 'package:vendor_flutter/Utils/Messages.dart';
+import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
+import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/bloc/gallery_bloc.dart';
 import 'package:vendor_flutter/data/ImageList.dart';
@@ -23,6 +26,8 @@ class _GalleryImagesState extends State<GalleryImages> {
   ScrollController _scrollController = new ScrollController();
   var imagesList = new List<ImageList>();
   var isLoading = true;
+  CustomLoader _customLoader = CustomLoader();
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +48,8 @@ class _GalleryImagesState extends State<GalleryImages> {
                   getImage();
                 },
                 highlightedBorderColor: AppColors.kGreen,
-                shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0),)
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(10.0),)
             ),
             SizedBox(height: 20,),
             Expanded(child: isLoading & imagesList.isEmpty ? Center(
@@ -65,12 +71,12 @@ class _GalleryImagesState extends State<GalleryImages> {
             child: Stack(
               children: <Widget>[
                 new Card(
-                  semanticContainer: true,
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  elevation: 5.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                    semanticContainer: true,
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    elevation: 5.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
 //                  child: Image.network(
 //                    'http://gk3.puneetchawla.in/${imagesList[index]
 //                        .image}',
@@ -86,7 +92,9 @@ class _GalleryImagesState extends State<GalleryImages> {
                   right: 1,
                   child: IconButton(
                       icon: Icon(Icons.delete, size: 20, color: Colors.red,),
-                      onPressed: () {}),
+                      onPressed: () {
+                        deleteImage(imagesList[index].id);
+                      }),
                 ),
               ],
 
@@ -114,7 +122,10 @@ class _GalleryImagesState extends State<GalleryImages> {
       _image = image;
       print("Image $_image");
     });
-    _galleryBloc.uploadImage(_image, context);
+    var response = await _galleryBloc.uploadImage(_image, context);
+    if (response != null) {
+      fetchImages();
+    }
   }
 
 
@@ -138,4 +149,41 @@ class _GalleryImagesState extends State<GalleryImages> {
       throw Exception('Failed to load post');
     }
   }
+
+  deleteImage(int id) async {
+    _customLoader.showLoader(context);
+    bool isConnected = await isConnectedToInternet();
+    if (!isConnected ?? true) {
+      _customLoader.hideLoader();
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: AppMessages.noInternetError);
+      return;
+    }
+    String url = "${ApiUrl.baseUrl}image?id=$id";
+    print(url);
+    Map<String, String> header = {
+      "id": "$id",
+      "Accept": "application/json",
+      "token": MemoryManagement
+          .getAccessToken()
+    };
+    print(header);
+    final response =
+    await http.delete(url, headers: header);
+    print("delete response==> ${response.statusCode}");
+    print("delete response==> ${response.body}");
+    if (response.statusCode == 200) {
+      _customLoader.hideLoader();
+      fetchImages();
+    } else {
+      _customLoader.hideLoader();
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: "${AppMessages.generalError}");
+    }
+  }
+
 }

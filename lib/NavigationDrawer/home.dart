@@ -30,6 +30,11 @@ class HomeScreenState extends State<HomeScreen> {
   String _appBarTitle = "DASHBOARD";
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: GradientAppBar(
@@ -128,7 +133,7 @@ class HomeScreenState extends State<HomeScreen> {
                 children: <Widget>[
                   _getProfilePicField,
                   getSpacer(width: 16),
-                  Text("Shubham Gupta",
+                  Text("${MemoryManagement.getName()}",
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 20.0,

@@ -38,22 +38,18 @@ class LoginBloc extends BaseBloc {
       print("result :$result");
       String token = result != null ? "${result['token'] ?? ""}" : "";
       print("bloc Staus:$token");
-      int status = int.tryParse("${result['status']}");
-      print("status $status");
-      String msg = result['message'];
+      String msg = result != null ? result['message'] ?? "" : "";
+      String name = result != null ? result['name'] ?? "" : "";
       print(msg);
       if (token.isNotEmpty) {
         await MemoryManagement.init();
         MemoryManagement.setAccessToken(accessToken: token);
+        MemoryManagement.setName(name: name);
         _customLoader.hideLoader();
         Navigator.pushAndRemoveUntil(
             context,
             CupertinoPageRoute(builder: (context) => new HomeScreen()),
             (Route<dynamic> route) => false);
-      } else {
-        _customLoader.hideLoader();
-        showAlertDialog(
-            context: context, title: "Error", message: result['message']);
       }
     } catch (e, st) {
       _customLoader.hideLoader();
