@@ -8,6 +8,7 @@ import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/createSale/createSale.dart';
 import 'package:vendor_flutter/gallery/GalleryImages.dart';
+import 'package:vendor_flutter/transactions/TransactionScreen.dart';
 
 enum ActiveScreen {
   Dashboard,
@@ -58,6 +59,7 @@ class HomeScreenState extends State<HomeScreen> {
                   text: 'Sales entry',
                   onTap: () {
                     _activeScreen = ActiveScreen.SalesEntry;
+                    _appBarTitle="Sales Entry";
                     setState(() {});
                     Navigator.of(context).pop();
                   }),
@@ -66,6 +68,7 @@ class HomeScreenState extends State<HomeScreen> {
                   text: 'Transaction History',
                   onTap: () {
                     _activeScreen = ActiveScreen.TransactionHistory;
+                    _appBarTitle='Transaction History';
                     setState(() {});
                     Navigator.of(context).pop();
                   }),
@@ -74,6 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
                   text: 'Gallery',
                   onTap: () {
                     _activeScreen = ActiveScreen.Gallery;
+                    _appBarTitle='Gallery';
                     setState(() {});
                     Navigator.of(context).pop();
                   }),
@@ -82,6 +86,7 @@ class HomeScreenState extends State<HomeScreen> {
                   text: 'Payment History',
                   onTap: () {
                     _activeScreen = ActiveScreen.PaymentHistory;
+                    _appBarTitle='Payment History';
                     setState(() {});
                     Navigator.of(context).pop();
                   }),
@@ -178,13 +183,13 @@ class HomeScreenState extends State<HomeScreen> {
         return CreateSales();
         break;
       case ActiveScreen.TransactionHistory:
-        return defaultWidget;
+        return SimpleTable();
         break;
       case ActiveScreen.Gallery:
         return GalleryImages();
         break;
       case ActiveScreen.PaymentHistory:
-        return defaultWidget;
+        return SimpleTable();
         break;
       case ActiveScreen.logout:
         return defaultWidget;
