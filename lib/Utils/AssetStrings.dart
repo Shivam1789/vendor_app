@@ -9,6 +9,13 @@ class AssetStrings {
   static const String splashImage = "Assets/images/logoSplash.png";
   static const String splashImage2 = "Assets/images/logoSplash2.png";
 
+
+  static const String splashImage3 = "Assets/images/jerry/ic_splash.png";
+  static const String signInIcon = "Assets/images/jerry/ic_logo.png";
+  static const String signInEmailIcon = "Assets/images/jerry/ic_email.png";
+  static const String signInPassword = "Assets/images/jerry/ic_password.png";
+  static const String signInBg = "Assets/images/jerry/ic_bg.png";
+
   //Icons
   static const String backIconGrey = "Assets/images/sideMenu/leftArrowGrey.png";
   static const String backIconWhite = "Assets/images/back.png";
