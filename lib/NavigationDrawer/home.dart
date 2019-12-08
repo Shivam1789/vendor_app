@@ -11,7 +11,6 @@ import 'package:vendor_flutter/gallery/GalleryImages.dart';
 import 'package:vendor_flutter/transactions/TransactionScreen.dart';
 
 enum ActiveScreen {
-  Dashboard,
   SalesEntry,
   TransactionHistory,
   Gallery,
@@ -26,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   // UI Properties
-  ActiveScreen _activeScreen = ActiveScreen.Dashboard;
+  ActiveScreen _activeScreen = ActiveScreen.SalesEntry;
   String _appBarTitle = "DASHBOARD";
 
   @override
@@ -47,13 +46,13 @@ class HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.zero,
             children: <Widget>[
               _createHeader(),
-              _createDrawerItem(
-                  icon: Icons.contacts,
-                  text: 'DashBoard',
-                  onTap: () {
-                    _activeScreen = ActiveScreen.Dashboard;
-                    Navigator.of(context).pop();
-                  }),
+//              _createDrawerItem(
+//                  icon: Icons.contacts,
+//                  text: 'DashBoard',
+//                  onTap: () {
+//                    _activeScreen = ActiveScreen.Dashboard;
+//                    Navigator.of(context).pop();
+//                  }),
               _createDrawerItem(
                   icon: Icons.event,
                   text: 'Sales entry',
@@ -176,9 +175,9 @@ class HomeScreenState extends State<HomeScreen> {
       ),
     );
     switch (_activeScreen) {
-      case ActiveScreen.Dashboard:
-        return defaultWidget;
-        break;
+//      case ActiveScreen.SalesEntry:
+//        return defaultWidget;
+//        break;
       case ActiveScreen.SalesEntry:
         return CreateSales();
         break;

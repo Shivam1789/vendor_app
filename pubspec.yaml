@@ -60,7 +60,6 @@ flutter:
   assets:
     - Assets/images/
     - Assets/images/sideMenu/
-    - Assets/images/jerry/
   fonts:
      - family: Poppins
        fonts:

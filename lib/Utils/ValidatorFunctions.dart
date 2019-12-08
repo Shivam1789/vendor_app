@@ -124,6 +124,30 @@ String passwordValidator(
   return null;
 }
 
+String codEmpty(
+    {@required String code, @required BuildContext context}) {
+  if (code.isEmpty) {
+    return "Please enter customer code.";
+  }
+  return null;
+}
+
+String amountEmpty(
+    {@required String code, @required BuildContext context}) {
+  if (code.isEmpty) {
+    return "Please enter amount.";
+  }
+  return null;
+}
+
+String descEmpty(
+    {@required String code, @required BuildContext context}) {
+  if (code.isEmpty) {
+    return "Please enter description.";
+  }
+  return null;
+}
+
 // Validates "new password" field
 String newPasswordValidator(
     {@required String newPassword, @required BuildContext context}) {

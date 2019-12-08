@@ -120,7 +120,6 @@ class _GalleryImagesState extends State<GalleryImages> {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = image;
-      print("Image $_image");
     });
     var response = await _galleryBloc.uploadImage(_image, context);
     if (response != null) {
