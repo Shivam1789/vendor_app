@@ -66,7 +66,8 @@ class _CreateSalesState extends State<CreateSales> {
             .setExecuteAfterPermissionGranted(true)
             .scan();
 
-        if (_barcodeString != null) {
+        if (_barcodeString != null && _barcodeString.contains("cust_id\$")) {
+          print(_barcodeString);
           final startIndex = _barcodeString.indexOf("\$");
           _codeController.text =
               _barcodeString.substring(startIndex+1, _barcodeString.length);
