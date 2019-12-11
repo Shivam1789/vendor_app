@@ -26,7 +26,7 @@ class HomeScreen extends StatefulWidget {
 class HomeScreenState extends State<HomeScreen> {
   // UI Properties
   ActiveScreen _activeScreen = ActiveScreen.SalesEntry;
-  String _appBarTitle = "DASHBOARD";
+  String _appBarTitle = "Sales Entry";
 
   @override
   void initState() {

@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:qrcode_reader/qrcode_reader.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
 import 'package:vendor_flutter/Utils/Messages.dart';
 import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
@@ -31,6 +33,7 @@ class _CreateSalesState extends State<CreateSales> {
   bool switchOn = true;
   String _availablePoints = "";
   CustomLoader _customLoader = CustomLoader();
+  String _barcodeString;
 
   void _onSwitchChanged(bool value) {
     switchOn = value;
@@ -48,6 +51,35 @@ class _CreateSalesState extends State<CreateSales> {
           fontWeight: FontWeight.w700,
           color: Colors.black,
         ),
+      ),
+    );
+  }
+
+  get _getScanCode {
+    return InkWell(
+      onTap: () async {
+        _barcodeString = await QRCodeReader()
+            .setAutoFocusIntervalInMs(200)
+            .setForceAutoFocus(true)
+            .setTorchEnabled(true)
+            .setHandlePermissions(true)
+            .setExecuteAfterPermissionGranted(true)
+            .scan();
+
+        if (_barcodeString != null) {
+          final startIndex = _barcodeString.indexOf("\$");
+          _codeController.text =
+              _barcodeString.substring(startIndex+1, _barcodeString.length);
+        }
+      },
+      child: new Text(
+        "Click here to scan Customer QR or enter Customer code info below.",
+        style: TextStyle(
+          fontSize: 15.0,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
@@ -74,92 +106,90 @@ class _CreateSalesState extends State<CreateSales> {
                           horizontal: 20.0,
                         ),
                         child: new SingleChildScrollView(
-                          child: new Container(
-                            height: getScreenSize(context: context).height -
-                                getStatusBarHeight(context: context),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                new Column(
-                                  children: <Widget>[
-                                    getSpacer(
-                                      height:
-                                      getScreenSize(context: context).height *
-                                          0.07,
-                                    ),
-                                    _getSignUpLabel,
-                                    getSpacer(
-                                      height:
-                                      getScreenSize(context: context).height *
-                                          0.1,
-                                    ),
-                                    _getNameField,
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween,
-                                      children: <Widget>[
-                                        _availablePoints
-                                            .isNotEmpty ? Text(
-                                          "Available points:$_availablePoints",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                              color: Colors.green),
-                                        ) : Container(),
-                                        InkWell(
-                                          onTap: () {
-                                            if (_codeController.text
-                                                .trim()
-                                                .isNotEmpty) {
-                                              _checkCode();
-                                            } else {
-                                              showAlertDialog(
-                                                  context: context,
-                                                  title: "Error",
-                                                  message: "Customer code canot be empty");
-                                            }
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Check Point",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 13,
-                                                  color: AppColors.kGreen),
-                                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              new Column(
+                                children: <Widget>[
+                                  getSpacer(
+                                    height:
+                                    getScreenSize(context: context).height *
+                                        0.07,
+                                  ),
+                                  _getSignUpLabel,
+                                  getSpacer(
+                                      height: 20
+                                  ),
+                                  _getScanCode,
+                                  getSpacer(
+                                      height: 20
+                                  ),
+                                  _getNameField,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceBetween,
+                                    children: <Widget>[
+                                      _availablePoints
+                                          .isNotEmpty ? Text(
+                                        "Available points:$_availablePoints",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                            color: Colors.green),
+                                      ) : Container(),
+                                      InkWell(
+                                        onTap: () {
+                                          if (_codeController.text
+                                              .trim()
+                                              .isNotEmpty) {
+                                            _checkCode();
+                                          } else {
+                                            showAlertDialog(
+                                                context: context,
+                                                title: "Error",
+                                                message: "Customer code canot be empty");
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Check Point",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 13,
+                                                color: AppColors.kGreen),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                    getSpacer(
-                                      height:
-                                      getScreenSize(context: context).height *
-                                          0.02,
-                                    ),
-                                    _getAmount,
-                                    getSpacer(
-                                      height:
-                                      getScreenSize(context: context).height *
-                                          0.02,
-                                    ),
-                                    _getSales,
-                                    getSpacer(
-                                      height:
-                                      getScreenSize(context: context).height *
-                                          0.02,
-                                    ),
-                                    _getAvailablePoint(),
-                                    getSpacer(
-                                      height:
-                                      getScreenSize(context: context).height *
-                                          0.02,
-                                    ),
-                                    _getSignUpButton,
-                                  ],
-                                ),
-                              ],
-                            ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  getSpacer(
+                                    height:
+                                    getScreenSize(context: context).height *
+                                        0.02,
+                                  ),
+                                  _getAmount,
+                                  getSpacer(
+                                    height:
+                                    getScreenSize(context: context).height *
+                                        0.02,
+                                  ),
+                                  _getSales,
+                                  getSpacer(
+                                    height:
+                                    getScreenSize(context: context).height *
+                                        0.02,
+                                  ),
+                                  _getAvailablePoint(),
+                                  getSpacer(
+                                    height:
+                                    getScreenSize(context: context).height *
+                                        0.02,
+                                  ),
+                                  _getSignUpButton,
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       )),

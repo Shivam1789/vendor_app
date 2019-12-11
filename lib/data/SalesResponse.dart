@@ -81,9 +81,9 @@ class User {
   String createdAt;
   String updatedAt;
   int status;
-  Null deletedAt;
+  String deletedAt;
   int parent;
-  Null dob;
+  String dob;
 
   User(
       {this.id,

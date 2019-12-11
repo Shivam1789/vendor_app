@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:json_table/json_table.dart';
-import 'package:vendor_flutter/Utils/wavy_header.dart';
+import 'package:vendor_flutter/Utils/memory_management.dart';
+import 'package:vendor_flutter/networks/api_urls.dart';
 
 class SimpleTable extends StatefulWidget {
   @override
@@ -21,10 +23,17 @@ class _SimpleTableState extends State<SimpleTable> {
       '"income":"10Rs","country":"India","area":"abc","day":"Monday","month":"april"},{"name":"Shyam","email":"shyam23@gmail.com","age":28,"income":"30Rs","country":"India","area":"abc",'
       '"day":"Monday","month":"april"},{"name":"John","email":"john@gmail.com","age":33,"income":"15Rs","country":"India","area":"abc","day":"Monday","month":"april"}]';
   bool toggle = true;
+  String transaction;
 
   @override
+  void initState() {
+    super.initState();
+    _getTransactions();
+  }
+  @override
   Widget build(BuildContext context) {
-    var json = jsonDecode(jsonSample);
+    var json = jsonDecode(transaction != null ? transaction : jsonSample);
+    print(json);
     return Scaffold(
       body: Container(
         padding: EdgeInsets.all(16.0),
@@ -84,5 +93,23 @@ class _SimpleTableState extends State<SimpleTable> {
     JsonEncoder encoder = new JsonEncoder.withIndent('  ');
     String jsonString = encoder.convert(json.decode(jsonObject));
     return jsonString;
+  }
+
+
+  _getTransactions() async {
+    String url = "${ApiUrl.baseUrl}transaction?token=${MemoryManagement
+        .getAccessToken()}";
+    print(url);
+    final response =
+    await http.get(url, headers: {"Accept": "application/json"});
+    print(response.body);
+    if (response.statusCode == 200) {
+      transaction = response.body;
+      setState(() {
+
+      });
+    } else {
+      throw Exception('Failed to load transactions');
+    }
   }
 }
