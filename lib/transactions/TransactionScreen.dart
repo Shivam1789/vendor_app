@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:json_table/json_table.dart';
+import 'package:vendor_flutter/Utils/AppColors.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
+import 'package:vendor_flutter/data/TransactionResponse.dart';
 import 'package:vendor_flutter/networks/api_urls.dart';
 
 class SimpleTable extends StatefulWidget {
@@ -12,18 +13,9 @@ class SimpleTable extends StatefulWidget {
 }
 
 class _SimpleTableState extends State<SimpleTable> {
-  final String jsonSample =
-      '[{"name":"Ram","email":"ram@gmail.com","age":23,"income":"10Rs","country":"India","area":"abc"},{"name":"Shyam","email":"shyam23@gmail.com",'
-      '"age":28,"income":"30Rs","country":"India","area":"abc","day":"Monday","month":"april"},{"name":"John","email":"john@gmail.com","age":33,"income":"15Rs","country":"India",'
-      '"area":"abc","day":"Monday","month":"april"},{"name":"Ram","email":"ram@gmail.com","age":23,"income":"10Rs","country":"India","area":"abc","day":"Monday","month":"april"},'
-      '{"name":"Shyam","email":"shyam23@gmail.com","age":28,"income":"30Rs","country":"India","area":"abc","day":"Monday","month":"april"},{"name":"John","email":"john@gmail.com",'
-      '"age":33,"income":"15Rs","country":"India","area":"abc","day":"Monday","month":"april"},{"name":"Ram","email":"ram@gmail.com","age":23,"income":"10Rs","country":"India",'
-      '"area":"abc","day":"Monday","month":"april"},{"name":"Shyam","email":"shyam23@gmail.com","age":28,"income":"30Rs","country":"India","area":"abc","day":"Monday","month":"april"},'
-      '{"name":"John","email":"john@gmail.com","age":33,"income":"15Rs","country":"India","area":"abc","day":"Monday","month":"april"},{"name":"Ram","email":"ram@gmail.com","age":23,'
-      '"income":"10Rs","country":"India","area":"abc","day":"Monday","month":"april"},{"name":"Shyam","email":"shyam23@gmail.com","age":28,"income":"30Rs","country":"India","area":"abc",'
-      '"day":"Monday","month":"april"},{"name":"John","email":"john@gmail.com","age":33,"income":"15Rs","country":"India","area":"abc","day":"Monday","month":"april"}]';
   bool toggle = true;
   String transaction;
+  var transactionList = new List<TransactionResponse>();
 
   @override
   void initState() {
@@ -32,68 +24,34 @@ class _SimpleTableState extends State<SimpleTable> {
   }
   @override
   Widget build(BuildContext context) {
-    var json = jsonDecode(transaction != null ? transaction : jsonSample);
-    print(json);
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.all(16.0),
-        child: toggle
-            ? Column(
-          children: [
-            JsonTable(
-              json,
-              showColumnToggle: false,
-              tableHeaderBuilder: (String header) {
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 0.5),
-                      color: Colors.grey[300]),
-                  child: Text(
-                    header,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.display1.copyWith(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16.0,
-                        color: Colors.black87),
-                  ),
-                );
-              },
-              tableCellBuilder: (value) {
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 4.0, vertical: 2.0),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 0.5,
-                          color: Colors.grey.withOpacity(0.5))),
-                  child: Text(
-                    value,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.display1.copyWith(
-                        fontSize: 16.0, color: Colors.grey[900]),
-                  ),
-                );
-              },
-              allowRowHighlight: true,
-              rowHighlightColor: Colors.yellow[500].withOpacity(0.7),
-              paginationRowCount: 10,
-            ),
-          ],
+        body: SingleChildScrollView(
+            child: transactionList.isEmpty ? Center(
+              child: CircularProgressIndicator(),) : getCustomTable(
+              headers: [
+                'Customer Name',
+                'Discount',
+                'Net Payable Amount',
+                'Admin share',
+                'Payable to Admin',
+                'Date'
+              ],
+              contentList: List.generate(transactionList.length, (x) {
+                List<String> data = new List<String>();
+                data.add('${transactionList[x]?.custName ?? ""}');
+                data.add(
+                    '${transactionList[x]?.discount ?? ""}');
+                data.add('${transactionList[x]?.finalAmount ?? ""}');
+                data.add('\$${transactionList[x]?.adminShare ?? ""}');
+                data.add('\$${transactionList[x]?.adminAmount ?? ""}');
+                data.add('${transactionList[x]?.istDate ?? ""}');
+                return data;
+              }),
+            )
         )
-            : Center(
-          child: Text(getPrettyJSONString(jsonSample)),
-        ),
-      ),
     );
   }
 
-  String getPrettyJSONString(jsonObject) {
-    JsonEncoder encoder = new JsonEncoder.withIndent('  ');
-    String jsonString = encoder.convert(json.decode(jsonObject));
-    return jsonString;
-  }
 
 
   _getTransactions() async {
@@ -104,6 +62,10 @@ class _SimpleTableState extends State<SimpleTable> {
     await http.get(url, headers: {"Accept": "application/json"});
     print(response.body);
     if (response.statusCode == 200) {
+      Iterable list = json.decode(response.body);
+      transactionList =
+          list.map((model) => TransactionResponse.fromJson(model)).toList();
+      print("transaction length ${transactionList.length}");
       transaction = response.body;
       setState(() {
 
@@ -112,4 +74,73 @@ class _SimpleTableState extends State<SimpleTable> {
       throw Exception('Failed to load transactions');
     }
   }
+
+
+  static getCustomTable(
+      {List<String> headers, List<List<String>> contentList: const []}) {
+    int n = contentList.length + 1;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Table(
+        defaultColumnWidth: FixedColumnWidth(150.0),
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        border: TableBorder(
+          horizontalInside: BorderSide(
+            color: Colors.black,
+            style: BorderStyle.solid,
+            width: 1.0,
+          ),
+          verticalInside: BorderSide(
+            color: Colors.black,
+            style: BorderStyle.solid,
+            width: 1.0,
+          ),
+        ),
+        children: List.generate(n, (i) {
+          if (i == 0) {
+            return TableRow(
+                decoration:
+                BoxDecoration(color: Colors.blueGrey),
+                children: List.generate(headers.length, (j) {
+                  return getTableHeader(headers[j]);
+                }));
+          } else {
+            return TableRow(
+              decoration: BoxDecoration(
+                  border: Border(
+                      bottom: BorderSide(width: 0.4, color: Colors.black))),
+              children: List.generate(
+                contentList[i - 1].length,
+                    (j) {
+                  return getTableCell(contentList[i - 1][j]);
+                },
+              ),
+            );
+          }
+        }),
+      ),
+    );
+  }
+
+//return table header (container with background color and text)
+  static getTableHeader(String header) {
+    return Container(
+        padding: EdgeInsets.only(left: 10, right: 10),
+        height: 80,
+        child: Center(
+            child: Text(
+              header,
+              style: TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+            )));
+  }
+
+// return table cell (Container with transparent color and bottom border )
+  static getTableCell(String value) {
+    return Container(alignment: Alignment.center,
+        padding: EdgeInsets.only(left: 5, right: 5),
+        height: 55,
+        child: Center(child: Text(value)));
+  }
+
 }
