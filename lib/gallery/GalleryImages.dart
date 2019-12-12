@@ -14,6 +14,7 @@ import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/bloc/gallery_bloc.dart';
 import 'package:vendor_flutter/data/ImageList.dart';
 import 'package:vendor_flutter/networks/api_urls.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class GalleryImages extends StatefulWidget {
   @override
@@ -28,6 +29,8 @@ class _GalleryImagesState extends State<GalleryImages> {
   var isLoading = true;
   CustomLoader _customLoader = CustomLoader();
 
+  var _isVisible = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +44,15 @@ class _GalleryImagesState extends State<GalleryImages> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
+            Visibility(
+              visible: _isVisible,
+              child: Container(
+                width: getScreenSize(context: context).width,
+                height: 50,
+                alignment: Alignment.center,
+                color: Colors.red,
+                child: Text("Uploading Image. Please wait",
+                  style: TextStyle(color: Colors.white, fontSize: 14),),),),
             SizedBox(height: 20,),
             new OutlineButton(
                 child: new Text("Upload Image"),
@@ -77,12 +89,6 @@ class _GalleryImagesState extends State<GalleryImages> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
-//                  child: Image.network(
-//                    'http://gk3.puneetchawla.in/${imagesList[index]
-//                        .image}',
-//                    fit: BoxFit.fill,
-//                  ),
-
                     child: getCachedNetworkImage(
                         url: 'http://gk3.puneetchawla.in/${imagesList[index]
                             .image}')
@@ -120,8 +126,13 @@ class _GalleryImagesState extends State<GalleryImages> {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = image;
+      _isVisible = true;
     });
     var response = await _galleryBloc.uploadImage(_image, context);
+    _isVisible = false;
+    setState(() {
+
+    });
     if (response != null) {
       fetchImages();
     }

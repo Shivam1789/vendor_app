@@ -70,7 +70,7 @@ class _CreateSalesState extends State<CreateSales> {
           print(_barcodeString);
           final startIndex = _barcodeString.indexOf("\$");
           _codeController.text =
-              _barcodeString.substring(startIndex+1, _barcodeString.length);
+              _barcodeString.substring(startIndex + 1, _barcodeString.length);
         }
       },
       child: new Text(
@@ -362,11 +362,6 @@ class _CreateSalesState extends State<CreateSales> {
       setState(() {
 
       });
-
-//      showAlertDialog(
-//          context: context,
-//          title: "Success",
-//          message: "Customer code added successfuly");
     } else {
       _customLoader.hideLoader();
       showAlertDialog(
@@ -402,8 +397,8 @@ class _CreateSalesState extends State<CreateSales> {
     await http.post(url, headers: {"Accept": "application/json"}, body: body);
     print(response.statusCode);
     print(response.body);
-    var result=jsonDecode(response.body);
-    var msg=result["message"];
+    var result = jsonDecode(response.body);
+    var msg = result["message"];
     if (response.statusCode == 200) {
       _customLoader.hideLoader();
       showAlertDialog(
@@ -419,98 +414,21 @@ class _CreateSalesState extends State<CreateSales> {
     }
   }
 
-
-  void showCustomDialog(BuildContext context) {
-    Dialog dialogWithImage = Dialog(
-      child: Container(
-        height: 400.0,
-        width: 300.0,
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(12),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: Colors.grey[300]),
-              child: Text(
-                "Sale Detail",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600),
-              ),
-            ),
-            getSpacer(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: SingleChildScrollView(
-                child: Column(children: <Widget>[
-                  dialogTile(txt: "Customer Name:",
-                      value: salesResponse.data.user.name ?? ""),
-                  dialogTile(
-                      txt: "Total Bill:", value: salesResponse.data.amount.toString()),
-                  dialogTile(
-                      txt: "Point Redeemed:", value: salesResponse.data.disc.toString()),
-                  dialogTile(txt: "Payable Amount:",
-                      value: salesResponse.data.finalAmount.toString()),
-                  dialogTile(
-                      txt: "Point(s) earned:",
-                      value: salesResponse.data.points.toString()),
-                ],),
-              ),
-            ),
-            getSpacer(height: 20),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                RaisedButton(
-                  color: AppColors.kGreen,
-                  onPressed: () {
-                    _createSales();
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'Paid',
-                    style: TextStyle(fontSize: 18.0, color: Colors.white),
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                RaisedButton(
-                  color: Colors.red,
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'Close!',
-                    style: TextStyle(fontSize: 18.0, color: Colors.white),
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-
-    showDialog(
-        context: context, builder: (BuildContext context) => dialogWithImage);
-  }
-
   Widget dialogTile({String txt, String value}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Text(txt,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,),
-        Text(value,
-          style: TextStyle(color: Colors.black), overflow: TextOverflow.
-          ellipsis,)
-      ],);
+    return Padding(
+      padding: EdgeInsets.all(8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(txt,
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,),
+          Text(value,
+            style: TextStyle(color: Colors.black), overflow: TextOverflow.
+            ellipsis, maxLines: 1,)
+        ],),
+    );
   }
 
 
@@ -539,7 +457,8 @@ class _CreateSalesState extends State<CreateSales> {
       salesResponse = SalesResponse.fromJson(response);
       print(salesResponse.data);
 
-      showCustomDialog(context);
+//      showCustomDialog(context);
+      _settingModalBottomSheet(context);
     } else {
       _customLoader.hideLoader();
       showAlertDialog(
@@ -549,4 +468,82 @@ class _CreateSalesState extends State<CreateSales> {
     }
   }
 
+  void _settingModalBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.grey[300]),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      getSpacer(height: 0),
+                      Text(
+                        "Sale Detail",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          FontAwesomeIcons.times, color: AppColors.kGreen,),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },)
+                    ],
+                  ),
+                ),
+                getSpacer(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: SingleChildScrollView(
+                    child: Column(children: <Widget>[
+                      dialogTile(txt: "Customer Name:",
+                          value: salesResponse.data.user.name ?? ""),
+                      dialogTile(
+                          txt: "Total Bill:",
+                          value: salesResponse.data.amount.toString()),
+                      dialogTile(
+                          txt: "Point Redeemed:",
+                          value: salesResponse.data.disc.toString()),
+                      dialogTile(txt: "Payable Amount:",
+                          value: salesResponse.data.finalAmount.toString()),
+                      dialogTile(
+                          txt: "Point(s) earned:",
+                          value: salesResponse.data.points.toString()),
+                    ],),
+                  ),
+                ),
+                getSpacer(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 140,
+                      height: 40,
+                      child: RaisedButton(
+                          child: new Text(
+                            "Paid", style: TextStyle(color: AppColors.kWhite),),
+                          onPressed: () {
+                            _createSales();
+                            Navigator.of(context).pop();
+                          },
+                          color: AppColors.kGreen,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(4),)
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
 }
