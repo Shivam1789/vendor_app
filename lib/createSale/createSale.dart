@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:qrcode_reader/qrcode_reader.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
+import 'package:vendor_flutter/Utils/AssetStrings.dart';
 import 'package:vendor_flutter/Utils/Messages.dart';
 import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
@@ -55,23 +57,27 @@ class _CreateSalesState extends State<CreateSales> {
     );
   }
 
+  _scanBarcode() async {
+    _barcodeString = await QRCodeReader()
+        .setAutoFocusIntervalInMs(200)
+        .setForceAutoFocus(true)
+        .setTorchEnabled(true)
+        .setHandlePermissions(true)
+        .setExecuteAfterPermissionGranted(true)
+        .scan();
+
+    if (_barcodeString != null && _barcodeString.contains("cust_id\$")) {
+      print(_barcodeString);
+      final startIndex = _barcodeString.indexOf("\$");
+      _codeController.text =
+          _barcodeString.substring(startIndex + 1, _barcodeString.length);
+    }
+  }
+
   get _getScanCode {
     return InkWell(
       onTap: () async {
-        _barcodeString = await QRCodeReader()
-            .setAutoFocusIntervalInMs(200)
-            .setForceAutoFocus(true)
-            .setTorchEnabled(true)
-            .setHandlePermissions(true)
-            .setExecuteAfterPermissionGranted(true)
-            .scan();
-
-        if (_barcodeString != null && _barcodeString.contains("cust_id\$")) {
-          print(_barcodeString);
-          final startIndex = _barcodeString.indexOf("\$");
-          _codeController.text =
-              _barcodeString.substring(startIndex + 1, _barcodeString.length);
-        }
+        _scanBarcode();
       },
       child: new Text(
         "Click here to scan Customer QR or enter Customer code info below.",
@@ -120,6 +126,19 @@ class _CreateSalesState extends State<CreateSales> {
                                   _getSignUpLabel,
                                   getSpacer(
                                       height: 20
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      _scanBarcode();
+                                    },
+                                    child: new Image.asset(
+                                      AssetStrings.barcode,
+                                      fit: BoxFit.fill,
+                                      height: getScreenSize(context: context)
+                                          .width * 0.21,
+                                      width: getScreenSize(context: context)
+                                          .width * 0.28,
+                                    ),
                                   ),
                                   _getScanCode,
                                   getSpacer(
@@ -188,6 +207,11 @@ class _CreateSalesState extends State<CreateSales> {
                                         0.02,
                                   ),
                                   _getSignUpButton,
+                                  getSpacer(
+                                    height:
+                                    getScreenSize(context: context).height *
+                                        0.02,
+                                  )
                                 ],
                               ),
                             ],

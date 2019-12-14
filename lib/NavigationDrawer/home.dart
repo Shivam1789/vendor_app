@@ -8,6 +8,7 @@ import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/createSale/createSale.dart';
 import 'package:vendor_flutter/gallery/GalleryImages.dart';
+import 'package:vendor_flutter/payment/TransactionScreen.dart';
 import 'package:vendor_flutter/transactions/TransactionScreen.dart';
 
 enum ActiveScreen {
@@ -182,13 +183,13 @@ class HomeScreenState extends State<HomeScreen> {
         return CreateSales();
         break;
       case ActiveScreen.TransactionHistory:
-        return SimpleTable();
+        return TransactionTable();
         break;
       case ActiveScreen.Gallery:
         return GalleryImages();
         break;
       case ActiveScreen.PaymentHistory:
-        return SimpleTable();
+        return PaymentTable();
         break;
       case ActiveScreen.logout:
         return defaultWidget;

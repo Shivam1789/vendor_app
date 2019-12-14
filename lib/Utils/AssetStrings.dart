@@ -8,6 +8,7 @@ class AssetStrings {
   static const String logoImage = "Assets/images/logo.png";
   static const String splashImage = "Assets/images/logoSplash.png";
   static const String splashImage2 = "Assets/images/logoSplash2.png";
+  static const String barcode = "Assets/images/ic_barcode.png";
 
 
   //Icons

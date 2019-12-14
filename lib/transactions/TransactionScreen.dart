@@ -2,17 +2,17 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:vendor_flutter/Utils/AppColors.dart';
+import 'package:intl/intl.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/data/TransactionResponse.dart';
 import 'package:vendor_flutter/networks/api_urls.dart';
 
-class SimpleTable extends StatefulWidget {
+class TransactionTable extends StatefulWidget {
   @override
-  _SimpleTableState createState() => _SimpleTableState();
+  _TransactionTableState createState() => _TransactionTableState();
 }
 
-class _SimpleTableState extends State<SimpleTable> {
+class _TransactionTableState extends State<TransactionTable> {
   bool toggle = true;
   String transaction;
   var transactionList = new List<TransactionResponse>();
@@ -27,32 +27,41 @@ class _SimpleTableState extends State<SimpleTable> {
     return Scaffold(
         body: SingleChildScrollView(
             child: transactionList.isEmpty ? Center(
-              child: CircularProgressIndicator(),) : getCustomTable(
-              headers: [
-                'Customer Name',
-                'Discount',
-                'Net Payable Amount',
-                'Admin share',
-                'Payable to Admin',
-                'Date'
-              ],
-              contentList: List.generate(transactionList.length, (x) {
-                List<String> data = new List<String>();
-                data.add('${transactionList[x]?.custName ?? ""}');
-                data.add(
-                    '${transactionList[x]?.discount ?? ""}');
-                data.add('${transactionList[x]?.finalAmount ?? ""}');
-                data.add('\$${transactionList[x]?.adminShare ?? ""}');
-                data.add('\$${transactionList[x]?.adminAmount ?? ""}');
-                data.add('${transactionList[x]?.istDate ?? ""}');
-                return data;
-              }),
-            )
+              child: CircularProgressIndicator(),) : Column(children: <Widget>[
+              getCustomTable(
+                headers: [
+                  'Customer Name',
+                  'Total Amount',
+                  'Discount',
+                  'Net Payable Amount',
+                  'Admin share',
+                  'Payable to Admin',
+                  'Date'
+                ],
+                contentList: List.generate(transactionList.length, (x) {
+                  List<String> data = new List<String>();
+                  data.add('${transactionList[x]?.custName ?? ""}');
+                  data.add('${transactionList[x]?.amount.toString() ?? ""}');
+                  data.add(
+                      '${transactionList[x]?.discount ?? ""}');
+                  data.add('${transactionList[x]?.finalAmount ?? ""}');
+                  data.add('${transactionList[x]?.adminAmount ?? ""}');
+                  data.add('${transactionList[x]?.adminShare ?? ""}');
+                  data.add('${transactionList[x]?.istDate ?? ""}');
+                  return data;
+                }),
+              )
+            ],)
         )
     );
   }
 
 
+  String _convertToLocal({String date}) {
+    DateFormat format = new DateFormat("yyyy-MM-dd hh:mm");
+    DateTime time = format.parse(date);
+    return time.toLocal().toString();
+  }
 
   _getTransactions() async {
     String url = "${ApiUrl.baseUrl}transaction?token=${MemoryManagement
