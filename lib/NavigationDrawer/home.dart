@@ -8,7 +8,7 @@ import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/createSale/createSale.dart';
 import 'package:vendor_flutter/gallery/GalleryImages.dart';
-import 'package:vendor_flutter/payment/TransactionScreen.dart';
+import 'package:vendor_flutter/payment/PaymentScreen.dart';
 import 'package:vendor_flutter/transactions/TransactionScreen.dart';
 
 enum ActiveScreen {

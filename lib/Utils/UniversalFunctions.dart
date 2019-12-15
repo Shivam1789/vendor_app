@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 
 import 'AppColors.dart';
 import 'Localization.dart';
@@ -16,7 +14,6 @@ import 'LocalizationValues.dart';
 import 'Messages.dart';
 import 'ReusableComponents/CustomNavigationTranstions.dart';
 import 'UniversalProperties.dart';
-import 'memory_management.dart';
 
 // Returns screen size
 Size getScreenSize({@required BuildContext context}) {
@@ -728,4 +725,10 @@ String toMsgTimeFormat(DateTime dateTime) {
 }
 String toChatDateFormat(DateTime dateTime) {
   return dateTime == null ? "" : DateFormat("EEEE, MMM d y").format(dateTime);
+}
+
+
+printLog(String msg) {
+  var logger = Logger();
+  logger.d(msg);
 }

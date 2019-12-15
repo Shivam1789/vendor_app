@@ -30,14 +30,15 @@ dependencies:
   shared_preferences: ^0.5.2
   country_pickers: ^1.0.4
   fluttertoast: ^3.0.4
-  intl: ^0.15.0
+  intl: ^0.15.8
   device_info: ^0.4.0+1
   unique_id: ^0.0.2
   provider: ^2.0.0
   gradient_app_bar: ^0.0.1
-#  dio: ^3.0.7
   rxdart: ^0.22.3
   qrcode_reader: ^0.4.4
+  logger: ^0.7.0+2
+
 
 dev_dependencies:
   flutter_test:

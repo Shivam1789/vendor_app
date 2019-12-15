@@ -50,7 +50,7 @@ class _GalleryImagesState extends State<GalleryImages> {
                 width: getScreenSize(context: context).width,
                 height: 50,
                 alignment: Alignment.center,
-                color: Colors.red,
+                color: Colors.blueGrey,
                 child: Text("Uploading Image. Please wait",
                   style: TextStyle(color: Colors.white, fontSize: 14),),),),
             SizedBox(height: 20,),
