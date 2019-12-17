@@ -22,6 +22,22 @@ String emailValidator(
   return null;
 }
 
+String amountDescValidator(
+    {@required String desc}) {
+  if (desc.trim().isEmpty) {
+    return "The description field is required.";
+  }
+  return null;
+}
+
+String amountValidator(
+    {@required String amount}) {
+  if (amount.trim().isEmpty) {
+    return "The amount field is required.";
+  }
+  return null;
+}
+
 // Validates qrCode field
 String qrCodeValidator(
     {@required String reason, @required BuildContext context}) {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import 'package:vendor_flutter/Utils/Messages.dart';
 import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
 import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
+import 'package:vendor_flutter/Utils/ValidatorFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/data/PaymentResponse.dart';
 import 'package:vendor_flutter/networks/api_urls.dart';
@@ -26,7 +28,10 @@ class _PaymentTableState extends State<PaymentTable> {
   DateTime selectedDate = DateTime.now();
   TextEditingController _dateFromController = TextEditingController();
   TextEditingController _dateToController = TextEditingController();
+  TextEditingController _amountController = TextEditingController();
+  TextEditingController _descController = TextEditingController();
   CustomLoader _customLoader = CustomLoader();
+  final GlobalKey<FormState> _addPaymentKey = new GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -96,18 +101,13 @@ class _PaymentTableState extends State<PaymentTable> {
                               '${paymentResponse.result[x]?.istDate ?? ""}');
                           data.add(
                               '${_getStatusTxt(paymentResponse.result[x]?.status) ?? ""}');
-                          data.add('${"-"}');
+                          data.add('${showIconAccordingToStatus(
+                              paymentResponse.result[x]?.status) ?? ""}');
                           return data;
                         }),
                       )
                     ],
                   )));
-  }
-
-  String _convertToLocal({String date}) {
-    DateFormat format = new DateFormat("yyyy-MM-dd hh:mm");
-    DateTime time = format.parse(date);
-    return time.toLocal().toString();
   }
 
   _getPayments() async {
@@ -171,7 +171,14 @@ class _PaymentTableState extends State<PaymentTable> {
               children: List.generate(
                 contentList[i - 1].length,
                 (j) {
-                  return getTableCell(contentList[i - 1][j]);
+                  printLog(contentList[i - 1][j]);
+                  if (contentList[i - 1][j] == "no") {
+                    return getTableCellWithIcon(FontAwesomeIcons.ban);
+                  } else if (contentList[i - 1][j] == "edit") {
+                    return getTableCellWithEdtDeleteIcon();
+                  } else {
+                    return getTableCell(contentList[i - 1][j]);
+                  }
                 },
               ),
             );
@@ -202,6 +209,30 @@ class _PaymentTableState extends State<PaymentTable> {
         child: Center(child: Text(value)));
   }
 
+  static getTableCellWithIcon(IconData icon) {
+    return Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(left: 5, right: 5),
+        height: 55,
+        child: Center(child: Icon(icon, color: Colors.red,)));
+  }
+
+
+  static getTableCellWithEdtDeleteIcon() {
+    return Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(left: 5, right: 5),
+        height: 55,
+        child: Center(child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(FontAwesomeIcons.trashAlt, color: Colors.red,),
+            getSpacer(width: 4),
+            Icon(FontAwesomeIcons.penSquare, color: Colors.black54,),
+          ],
+        )));
+  }
+
   String _getPaymentType(num amount) {
     if (amount > 0) {
       return "Given Money";
@@ -215,6 +246,15 @@ class _PaymentTableState extends State<PaymentTable> {
       return "Approved";
     } else {
       return "Approval\nPending";
+    }
+  }
+
+
+  String showIconAccordingToStatus(int status) {
+    if (status == 1) {
+      return "no";
+    } else {
+      return "edit";
     }
   }
 
@@ -338,7 +378,9 @@ class _PaymentTableState extends State<PaymentTable> {
             child: new Text(
               "Add", style: TextStyle(color: AppColors.kWhite),),
             onPressed: () {
-
+              _addPaymentBottomSheet(context);
+              _descController.clear();
+              _amountController.clear();
             },
             color: AppColors.kGreen,
             shape: new RoundedRectangleBorder(
@@ -371,5 +413,156 @@ class _PaymentTableState extends State<PaymentTable> {
       _customLoader.hideLoader();
       throw Exception('Failed to load transactions');
     }
+  }
+
+
+  _addPayment() async {
+    bool isConnected = await isConnectedToInternet();
+    if (!isConnected ?? true) {
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: AppMessages.noInternetError);
+      return;
+    }
+    _customLoader.showLoader(context);
+
+    String url = "${ApiUrl.baseUrl}payment?token=${MemoryManagement
+        .getAccessToken()}";
+
+    print(url);
+    Map<String, dynamic> body = {
+      "amount": _amountController.text.trim(),
+      "description": _descController.text.trim(),
+      "status": "0"
+    };
+
+    final response =
+    await http.post(url, headers: {"Accept": "application/json"}, body: body);
+    print(response.statusCode);
+    print(response.body);
+    var result = jsonDecode(response.body);
+    var msg = result["message"];
+    if (response.statusCode == 200) {
+      _customLoader.hideLoader();
+      Fluttertoast.showToast(
+          msg: msg,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    } else {
+      _customLoader.hideLoader();
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: msg);
+    }
+  }
+
+  void _addPaymentBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.grey[300]),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      getSpacer(height: 0),
+                      Text(
+                        "Add Payment",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          FontAwesomeIcons.times, color: AppColors.kGreen,),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },)
+                    ],
+                  ),
+                ),
+                getSpacer(height: 30),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _addPaymentKey,
+                      child: Column(children: <Widget>[
+                        TextFormField(
+                            controller: _amountController,
+                            validator: (value) {
+                              return amountValidator(amount: value);
+                            },
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                labelText: "Amount",
+                                border: new OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(6.0),
+                                  borderSide: new BorderSide(
+                                  ),
+                                )
+                            )
+                        ),
+                        getSpacer(height: 10),
+                        TextFormField(
+                            controller: _descController,
+                            validator: (value) {
+                              return amountDescValidator(desc: value);
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                labelText: "Payment Description",
+                                border: new OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(6.0),
+                                  borderSide: new BorderSide(
+                                  ),
+                                )
+                            )
+                        ),
+                      ],),
+                    ),
+                  ),
+                ),
+                getSpacer(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 140,
+                      height: 40,
+                      child: RaisedButton(
+                          child: new Text(
+                            "Add", style: TextStyle(color: AppColors.kWhite),),
+                          onPressed: () {
+                            if (_addPaymentKey.currentState.validate()) {
+                              _addPayment();
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          color: AppColors.kGreen,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(4),)
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+    );
   }
 }
