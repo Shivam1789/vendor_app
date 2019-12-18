@@ -29,9 +29,12 @@ class _PaymentTableState extends State<PaymentTable> {
   TextEditingController _dateFromController = TextEditingController();
   TextEditingController _dateToController = TextEditingController();
   TextEditingController _amountController = TextEditingController();
+  TextEditingController _amountUpdateController = TextEditingController();
   TextEditingController _descController = TextEditingController();
+  TextEditingController _descUpdateController = TextEditingController();
   CustomLoader _customLoader = CustomLoader();
   final GlobalKey<FormState> _addPaymentKey = new GlobalKey<FormState>();
+  final GlobalKey<FormState> _updatePaymentKey = new GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -136,7 +139,7 @@ class _PaymentTableState extends State<PaymentTable> {
     }
   }
 
-  static getCustomTable(
+  getCustomTable(
       {List<String> headers, List<List<String>> contentList: const []}) {
     int n = contentList.length + 1;
     return SingleChildScrollView(
@@ -175,7 +178,7 @@ class _PaymentTableState extends State<PaymentTable> {
                   if (contentList[i - 1][j] == "no") {
                     return getTableCellWithIcon(FontAwesomeIcons.ban);
                   } else if (contentList[i - 1][j] == "edit") {
-                    return getTableCellWithEdtDeleteIcon();
+                    return getTableCellWithEdtDeleteIcon(i - 1);
                   } else {
                     return getTableCell(contentList[i - 1][j]);
                   }
@@ -218,7 +221,7 @@ class _PaymentTableState extends State<PaymentTable> {
   }
 
 
-  static getTableCellWithEdtDeleteIcon() {
+  getTableCellWithEdtDeleteIcon(int i) {
     return Container(
         alignment: Alignment.center,
         padding: EdgeInsets.only(left: 5, right: 5),
@@ -226,9 +229,26 @@ class _PaymentTableState extends State<PaymentTable> {
         child: Center(child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(FontAwesomeIcons.trashAlt, color: Colors.red,),
+            InkWell(
+                onTap: () {
+                  deleteRow(paymentResponse.result[i].id);
+                  printLog("${paymentResponse.result[i].id}");
+                  printLog("${paymentResponse.result[i].amount}");
+                },
+                child: Icon(FontAwesomeIcons.trashAlt, color: Colors.red,)),
             getSpacer(width: 4),
-            Icon(FontAwesomeIcons.penSquare, color: Colors.black54,),
+            InkWell(
+                onTap: () {
+                  printLog("${paymentResponse.result[i]}");
+                  _amountUpdateController.text =
+                      paymentResponse.result[i].amount.toString();
+                  _descUpdateController.text =
+                      paymentResponse.result[i].description.toString();
+                  _updatePayment(
+                      context: context, id: paymentResponse.result[i].id);
+                },
+                child: Icon(
+                  FontAwesomeIcons.penSquare, color: Colors.black54,)),
           ],
         )));
   }
@@ -454,6 +474,7 @@ class _PaymentTableState extends State<PaymentTable> {
           textColor: Colors.white,
           fontSize: 16.0
       );
+      _getPayments();
     } else {
       _customLoader.hideLoader();
       showAlertDialog(
@@ -564,5 +585,192 @@ class _PaymentTableState extends State<PaymentTable> {
           );
         }
     );
+  }
+
+  deleteRow(int id) async {
+    _customLoader.showLoader(context);
+    bool isConnected = await isConnectedToInternet();
+    if (!isConnected ?? true) {
+      _customLoader.hideLoader();
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: AppMessages.noInternetError);
+      return;
+    }
+    String url = "${ApiUrl.baseUrl}payment?token=${MemoryManagement
+        .getAccessToken()}&id=$id";
+    print(url);
+    Map<String, String> header = {
+      "Accept": "application/json",
+    };
+    print(header);
+    final response =
+    await http.delete(url, headers: header);
+    print("delete response==> ${response.statusCode}");
+    print("delete response==> ${response.body}");
+    if (response.statusCode == 200) {
+      _customLoader.hideLoader();
+      _getPayments();
+    } else {
+      _customLoader.hideLoader();
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: "${AppMessages.generalError}");
+    }
+  }
+
+  void _updatePayment({BuildContext context, int id}) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.grey[300]),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      getSpacer(height: 0),
+                      Text(
+                        "Edit Payment",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          FontAwesomeIcons.times, color: AppColors.kGreen,),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },)
+                    ],
+                  ),
+                ),
+                getSpacer(height: 30),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _updatePaymentKey,
+                      child: Column(children: <Widget>[
+                        TextFormField(
+                            controller: _amountUpdateController,
+                            validator: (value) {
+                              return amountValidator(amount: value);
+                            },
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                labelText: "Amount",
+                                border: new OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(6.0),
+                                  borderSide: new BorderSide(
+                                  ),
+                                )
+                            )
+                        ),
+                        getSpacer(height: 10),
+                        TextFormField(
+                            controller: _descUpdateController,
+                            validator: (value) {
+                              return amountDescValidator(desc: value);
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                labelText: "Payment Description",
+                                border: new OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(6.0),
+                                  borderSide: new BorderSide(
+                                  ),
+                                )
+                            )
+                        ),
+                      ],),
+                    ),
+                  ),
+                ),
+                getSpacer(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 140,
+                      height: 40,
+                      child: RaisedButton(
+                          child: new Text(
+                            "Update",
+                            style: TextStyle(color: AppColors.kWhite),),
+                          onPressed: () {
+                            if (_updatePaymentKey.currentState.validate()) {
+                              Navigator.of(context).pop();
+                              _updatePaymentApi(id);
+                            }
+                          },
+                          color: AppColors.kGreen,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(4),)
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
+
+
+  _updatePaymentApi(id) async {
+    bool isConnected = await isConnectedToInternet();
+    if (!isConnected ?? true) {
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: AppMessages.noInternetError);
+      return;
+    }
+    _customLoader.showLoader(context);
+
+    String url = "${ApiUrl.baseUrl}payment?token=${MemoryManagement
+        .getAccessToken()}&id=$id";
+
+    print(url);
+    Map<String, dynamic> body = {
+      "amount": _amountUpdateController.text.trim(),
+      "description": _descUpdateController.text.trim(),
+      "status": "0"
+    };
+
+    final response =
+    await http.put(url, headers: {"Accept": "application/json"}, body: body);
+    print(response.statusCode);
+    print(response.body);
+    var result = jsonDecode(response.body);
+    var msg = result["message"];
+    if (response.statusCode == 200) {
+      _customLoader.hideLoader();
+      Fluttertoast.showToast(
+          msg: msg,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+      _getPayments();
+    } else {
+      _customLoader.hideLoader();
+      showAlertDialog(
+          context: context,
+          title: "Error",
+          message: msg);
+    }
   }
 }
