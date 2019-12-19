@@ -248,7 +248,7 @@ class _PaymentTableState extends State<PaymentTable> {
                       context: context, id: paymentResponse.result[i].id);
                 },
                 child: Icon(
-                  FontAwesomeIcons.penSquare, color: Colors.black54,)),
+                  FontAwesomeIcons.penSquare, color: AppColors.kGreen,)),
           ],
         )));
   }
