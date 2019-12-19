@@ -261,7 +261,7 @@ class _CreateSalesState extends State<CreateSales> {
         },
         inputAction: TextInputAction.next,
         icon: Icon(
-          FontAwesomeIcons.sortAmountUp,
+          FontAwesomeIcons.moneyBill,
           size: 20,
         ));
   }
@@ -279,7 +279,7 @@ class _CreateSalesState extends State<CreateSales> {
         keyboardType: TextInputType.text,
         inputAction: TextInputAction.done,
         icon: Icon(
-          FontAwesomeIcons.envelopeOpenText,
+          FontAwesomeIcons.fileMedical,
           size: 20,
         ));
   }
@@ -366,10 +366,7 @@ class _CreateSalesState extends State<CreateSales> {
   _checkCode() async {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     _customLoader.showLoader(context);
@@ -388,20 +385,14 @@ class _CreateSalesState extends State<CreateSales> {
       });
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: "Customer code is invalid");
+      getToast(msg: "Customer code is invalid");
     }
   }
 
   _createSales() async {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     _customLoader.showLoader(context);
@@ -424,17 +415,16 @@ class _CreateSalesState extends State<CreateSales> {
     var result = jsonDecode(response.body);
     var msg = result["message"];
     if (response.statusCode == 200) {
+      _amountController.clear();
+      _codeController.clear();
+      _descController.clear();
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Success",
-          message: msg);
+      getToast(msg: msg);
+      setState(() {
+      });
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: msg);
+      getToast(msg: msg);
     }
   }
 
@@ -459,10 +449,7 @@ class _CreateSalesState extends State<CreateSales> {
   _salesDetail() async {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     _customLoader.showLoader(context);
@@ -485,10 +472,7 @@ class _CreateSalesState extends State<CreateSales> {
       _settingModalBottomSheet(context);
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: "Something went wrong");
+      getToast(msg: "Something went wrong");
     }
   }
 
