@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -117,10 +116,7 @@ class _PaymentTableState extends State<PaymentTable> {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     String url =
@@ -135,6 +131,7 @@ class _PaymentTableState extends State<PaymentTable> {
       print("transaction length ${paymentResponse.result.length}");
       setState(() {});
     } else {
+      getToast(msg: "Something went wrong.");
       throw Exception('Failed to load transactions');
     }
   }
@@ -430,6 +427,7 @@ class _PaymentTableState extends State<PaymentTable> {
       print("transaction length ${paymentResponse.result.length}");
       setState(() {});
     } else {
+      getToast(msg: "Something went wrong.");
       _customLoader.hideLoader();
       throw Exception('Failed to load transactions');
     }
@@ -439,10 +437,7 @@ class _PaymentTableState extends State<PaymentTable> {
   _addPayment() async {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     _customLoader.showLoader(context);
@@ -465,22 +460,11 @@ class _PaymentTableState extends State<PaymentTable> {
     var msg = result["message"];
     if (response.statusCode == 200) {
       _customLoader.hideLoader();
-      Fluttertoast.showToast(
-          msg: msg,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIos: 1,
-          backgroundColor: Colors.black87,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
+      getToast(msg: msg);
       _getPayments();
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: msg);
+      getToast(msg: msg);
     }
   }
 
@@ -592,10 +576,7 @@ class _PaymentTableState extends State<PaymentTable> {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     String url = "${ApiUrl.baseUrl}payment?token=${MemoryManagement
@@ -612,12 +593,10 @@ class _PaymentTableState extends State<PaymentTable> {
     if (response.statusCode == 200) {
       _customLoader.hideLoader();
       _getPayments();
+      getToast(msg: "Record is deleted successfully.");
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: "${AppMessages.generalError}");
+      getToast(msg: AppMessages.generalError);
     }
   }
 
@@ -729,10 +708,7 @@ class _PaymentTableState extends State<PaymentTable> {
   _updatePaymentApi(id) async {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     _customLoader.showLoader(context);
@@ -755,22 +731,11 @@ class _PaymentTableState extends State<PaymentTable> {
     var msg = result["message"];
     if (response.statusCode == 200) {
       _customLoader.hideLoader();
-      Fluttertoast.showToast(
-          msg: msg,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIos: 1,
-          backgroundColor: Colors.black87,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
+      getToast(msg: msg);
       _getPayments();
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: msg);
+      getToast(msg: msg);
     }
   }
 }

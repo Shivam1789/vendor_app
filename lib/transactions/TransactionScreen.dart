@@ -76,13 +76,6 @@ class _TransactionTableState extends State<TransactionTable> {
     );
   }
 
-
-  String _convertToLocal({String date}) {
-    DateFormat format = new DateFormat("yyyy-MM-dd hh:mm");
-    DateTime time = format.parse(date);
-    return time.toLocal().toString();
-  }
-
   static getCustomTable(
       {List<String> headers, List<List<String>> contentList: const []}) {
     int n = contentList.length + 1;
@@ -176,6 +169,7 @@ class _TransactionTableState extends State<TransactionTable> {
 
       });
     } else {
+      getToast(msg: "Something went wrong");
       throw Exception('Failed to load transactions');
     }
   }
@@ -204,6 +198,7 @@ class _TransactionTableState extends State<TransactionTable> {
       });
     } else {
       _customLoader.hideLoader();
+      getToast(msg: "Something went wrong");
       throw Exception('Failed to load transactions');
     }
   }

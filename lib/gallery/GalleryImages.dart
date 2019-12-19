@@ -14,7 +14,6 @@ import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/bloc/gallery_bloc.dart';
 import 'package:vendor_flutter/data/ImageList.dart';
 import 'package:vendor_flutter/networks/api_urls.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class GalleryImages extends StatefulWidget {
   @override
@@ -140,6 +139,11 @@ class _GalleryImagesState extends State<GalleryImages> {
 
 
   fetchImages() async {
+    bool isConnected = await isConnectedToInternet();
+    if (!isConnected ?? true) {
+      getToast(msg: AppMessages.noInternetError);
+      return;
+    }
     String url = "${ApiUrl.baseUrl}image?token=${MemoryManagement
         .getAccessToken()}";
     print(url);
@@ -165,10 +169,7 @@ class _GalleryImagesState extends State<GalleryImages> {
     bool isConnected = await isConnectedToInternet();
     if (!isConnected ?? true) {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: AppMessages.noInternetError);
+      getToast(msg: AppMessages.noInternetError);
       return;
     }
     String url = "${ApiUrl.baseUrl}image?id=$id";
@@ -186,13 +187,11 @@ class _GalleryImagesState extends State<GalleryImages> {
     print("delete response==> ${response.body}");
     if (response.statusCode == 200) {
       _customLoader.hideLoader();
+      getToast(msg: "Image deleted successfully.");
       fetchImages();
     } else {
       _customLoader.hideLoader();
-      showAlertDialog(
-          context: context,
-          title: "Error",
-          message: "${AppMessages.generalError}");
+      getToast(msg: AppMessages.generalError);
     }
   }
 
