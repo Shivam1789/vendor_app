@@ -414,7 +414,7 @@ class _PaymentTableState extends State<PaymentTable> {
     String url =
         "${ApiUrl.baseUrl}payment?token=${MemoryManagement
         .getAccessToken()}&date_from=${_dateFromController
-        .text}&date_to=${_dateFromController.text}";
+        .text}&date_to=${_dateToController.text}";
 
     print(url);
     final response =
@@ -473,6 +473,7 @@ class _PaymentTableState extends State<PaymentTable> {
         context: context,
         builder: (BuildContext bc) {
           return Container(
+            height: getScreenSize(context: context).height-200,
             child: Column(
               children: <Widget>[
                 Container(
@@ -501,44 +502,42 @@ class _PaymentTableState extends State<PaymentTable> {
                 getSpacer(height: 30),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _addPaymentKey,
-                      child: Column(children: <Widget>[
-                        TextFormField(
-                            controller: _amountController,
-                            validator: (value) {
-                              return amountValidator(amount: value);
-                            },
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                labelText: "Amount",
-                                border: new OutlineInputBorder(
-                                  borderRadius: new BorderRadius.circular(6.0),
-                                  borderSide: new BorderSide(
-                                  ),
-                                )
-                            )
-                        ),
-                        getSpacer(height: 10),
-                        TextFormField(
-                            controller: _descController,
-                            validator: (value) {
-                              return amountDescValidator(desc: value);
-                            },
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                labelText: "Payment Description",
-                                border: new OutlineInputBorder(
-                                  borderRadius: new BorderRadius.circular(6.0),
-                                  borderSide: new BorderSide(
-                                  ),
-                                )
-                            )
-                        ),
-                      ],),
-                    ),
+                  child: Form(
+                    key: _addPaymentKey,
+                    child: Column(children: <Widget>[
+                      TextFormField(
+                          controller: _amountController,
+                          validator: (value) {
+                            return amountValidator(amount: value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              labelText: "Amount",
+                              border: new OutlineInputBorder(
+                                borderRadius: new BorderRadius.circular(6.0),
+                                borderSide: new BorderSide(
+                                ),
+                              )
+                          )
+                      ),
+                      getSpacer(height: 10),
+                      TextFormField(
+                          controller: _descController,
+                          validator: (value) {
+                            return amountDescValidator(desc: value);
+                          },
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              labelText: "Payment Description",
+                              border: new OutlineInputBorder(
+                                borderRadius: new BorderRadius.circular(6.0),
+                                borderSide: new BorderSide(
+                                ),
+                              )
+                          )
+                      ),
+                    ],),
                   ),
                 ),
                 getSpacer(height: 20),
@@ -564,6 +563,7 @@ class _PaymentTableState extends State<PaymentTable> {
                     ),
                   ],
                 ),
+                getSpacer(height: 80)
               ],
             ),
           );
@@ -605,6 +605,7 @@ class _PaymentTableState extends State<PaymentTable> {
         context: context,
         builder: (BuildContext bc) {
           return Container(
+            height: getScreenSize(context: context).height-200,
             child: Column(
               children: <Widget>[
                 Container(
@@ -633,44 +634,42 @@ class _PaymentTableState extends State<PaymentTable> {
                 getSpacer(height: 30),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _updatePaymentKey,
-                      child: Column(children: <Widget>[
-                        TextFormField(
-                            controller: _amountUpdateController,
-                            validator: (value) {
-                              return amountValidator(amount: value);
-                            },
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                labelText: "Amount",
-                                border: new OutlineInputBorder(
-                                  borderRadius: new BorderRadius.circular(6.0),
-                                  borderSide: new BorderSide(
-                                  ),
-                                )
-                            )
-                        ),
-                        getSpacer(height: 10),
-                        TextFormField(
-                            controller: _descUpdateController,
-                            validator: (value) {
-                              return amountDescValidator(desc: value);
-                            },
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                labelText: "Payment Description",
-                                border: new OutlineInputBorder(
-                                  borderRadius: new BorderRadius.circular(6.0),
-                                  borderSide: new BorderSide(
-                                  ),
-                                )
-                            )
-                        ),
-                      ],),
-                    ),
+                  child: Form(
+                    key: _updatePaymentKey,
+                    child: Column(children: <Widget>[
+                      TextFormField(
+                          controller: _amountUpdateController,
+                          validator: (value) {
+                            return amountValidator(amount: value);
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              labelText: "Amount",
+                              border: new OutlineInputBorder(
+                                borderRadius: new BorderRadius.circular(6.0),
+                                borderSide: new BorderSide(
+                                ),
+                              )
+                          )
+                      ),
+                      getSpacer(height: 10),
+                      TextFormField(
+                          controller: _descUpdateController,
+                          validator: (value) {
+                            return amountDescValidator(desc: value);
+                          },
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+                              labelText: "Payment Description",
+                              border: new OutlineInputBorder(
+                                borderRadius: new BorderRadius.circular(6.0),
+                                borderSide: new BorderSide(
+                                ),
+                              )
+                          )
+                      ),
+                    ],),
                   ),
                 ),
                 getSpacer(height: 20),

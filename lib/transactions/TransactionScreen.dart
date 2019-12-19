@@ -180,7 +180,7 @@ class _TransactionTableState extends State<TransactionTable> {
     String url =
         "${ApiUrl.baseUrl}transaction?token=${MemoryManagement
         .getAccessToken()}&date_from=${_dateFromController
-        .text}&date_to=${_dateFromController.text}";
+        .text}&date_to=${_dateToController.text}";
 
     print(url);
     final response =

@@ -180,15 +180,12 @@ class _GalleryImagesState extends State<GalleryImages> {
       "token": MemoryManagement
           .getAccessToken()
     };
-    print(header);
     final response =
     await http.delete(url, headers: header);
-    print("delete response==> ${response.statusCode}");
-    print("delete response==> ${response.body}");
     if (response.statusCode == 200) {
+      fetchImages();
       _customLoader.hideLoader();
       getToast(msg: "Image deleted successfully.");
-      fetchImages();
     } else {
       _customLoader.hideLoader();
       getToast(msg: AppMessages.generalError);

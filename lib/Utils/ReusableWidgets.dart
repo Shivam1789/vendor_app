@@ -796,7 +796,7 @@ Widget getCachedNetworkImage(
     errorWidget: (BuildContext context, String error, Object obj) {
       return new Center(
         child: new Image.asset(
-          AssetStrings.logoImage,
+          AssetStrings.error,
           fit: BoxFit.fill,
           color: Colors.grey,
           height: 24.0,
