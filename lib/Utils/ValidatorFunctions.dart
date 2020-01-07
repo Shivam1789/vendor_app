@@ -318,6 +318,23 @@ String countryValidator(
   return null;
 }
 
+
+String subjectValidator(
+    {@required String val, @required BuildContext context}) {
+  if (val.trim().isEmpty) {
+    return "Subject should not be empty";
+  }
+  return null;
+}
+
+String messageValidator(
+    {@required String val, @required BuildContext context}) {
+  if (val.trim().isEmpty) {
+    return "Message should not be empty";
+  }
+  return null;
+}
+
 // Validates  name
 String assetAmountValidator(
     {@required String name, @required BuildContext context}) {

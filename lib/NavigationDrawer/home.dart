@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
+import 'package:vendor_flutter/ContactUsScreen/ContactUsScreen.dart';
 import 'package:vendor_flutter/LogIn/sliding_login.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
 import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
@@ -16,6 +17,7 @@ enum ActiveScreen {
   TransactionHistory,
   Gallery,
   PaymentHistory,
+  ContactUs,
   logout
 }
 
@@ -87,6 +89,15 @@ class HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     _activeScreen = ActiveScreen.PaymentHistory;
                     _appBarTitle='Payment History';
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  }),
+              _createDrawerItem(
+                  icon: Icons.credit_card,
+                  text: 'Contact Us',
+                  onTap: () {
+                    _activeScreen = ActiveScreen.ContactUs;
+                    _appBarTitle = 'Contact Us';
                     setState(() {});
                     Navigator.of(context).pop();
                   }),
@@ -190,6 +201,9 @@ class HomeScreenState extends State<HomeScreen> {
         break;
       case ActiveScreen.PaymentHistory:
         return PaymentTable();
+        break;
+      case ActiveScreen.ContactUs:
+        return ContactUs();
         break;
       case ActiveScreen.logout:
         return defaultWidget;
