@@ -1662,7 +1662,7 @@ Widget getToast({@required String msg}){
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIos: 1,
-      backgroundColor: Colors.black87,
+      backgroundColor: AppColors.kToastColor,
       textColor: Colors.white,
       fontSize: 16.0
   );
