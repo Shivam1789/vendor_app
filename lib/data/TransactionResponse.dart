@@ -64,7 +64,7 @@ class Customer {
   int city;
   String address;
   String code;
-  double points;
+  num points;
   int createdBy;
   String createdAt;
   String updatedAt;
