@@ -340,7 +340,7 @@ class _PaymentTableState extends State<PaymentTable> {
               _dateToController.text.isNotEmpty) {
             _getPaymentsWithFilter();
           } else {
-            showInSnackBar("Date from and date to should not be empty.");
+            getToast(msg: "Date from and date to should not be empty.");
           }
         },),
       ],
