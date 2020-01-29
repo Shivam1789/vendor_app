@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:qrcode_reader/qrcode_reader.dart';
 import 'package:vendor_flutter/Utils/AppColors.dart';
 import 'package:vendor_flutter/Utils/AssetStrings.dart';
@@ -24,10 +23,12 @@ class CreateSales extends StatefulWidget {
 
 class _CreateSalesState extends State<CreateSales> {
   final TextEditingController _codeController = new TextEditingController();
+  final TextEditingController _pointController = new TextEditingController();
   final TextEditingController _amountController = new TextEditingController();
   final TextEditingController _descController = new TextEditingController();
 
   final FocusNode _codeFocusNode = new FocusNode();
+  final FocusNode _pontFocusNode = new FocusNode();
   final FocusNode _amountFocusNode = new FocusNode();
   final FocusNode _descFocusNode = new FocusNode();
   final GlobalKey<FormState> _FormKey = new GlobalKey<FormState>();
@@ -164,10 +165,8 @@ class _CreateSalesState extends State<CreateSales> {
                                               .isNotEmpty) {
                                             _checkCode();
                                           } else {
-                                            showAlertDialog(
-                                                context: context,
-                                                title: "Error",
-                                                message: "Customer code canot be empty");
+                                            getToast(
+                                                msg: "Customer code canot be empty");
                                           }
                                         },
                                         child: Padding(
@@ -292,6 +291,11 @@ class _CreateSalesState extends State<CreateSales> {
       titleText: "CREATE SALES",
       onPressed: () {
         closeKeyboard(context: context, onClose: () {});
+        if (_codeController.text.isEmpty) {
+          _availablePoints = "";
+          setState(() {});
+        }
+        
         if (_FormKey.currentState.validate()) {
           _salesDetail();
         }
@@ -299,15 +303,17 @@ class _CreateSalesState extends State<CreateSales> {
     );
   }
 
+
   Widget _getAvailablePoint() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         SizedBox(
           width: 10,
         ),
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
               "Use Available Point",
@@ -320,11 +326,25 @@ class _CreateSalesState extends State<CreateSales> {
               onChanged: _onSwitchChanged,
               value: switchOn,
             ),
+            SizedBox(
+              width: 10,
+            ),
           ],
         ),
         SizedBox(
           width: 10,
-        )
+        ),
+        switchOn ? new Flexible(
+          child: new TextField(
+            controller: _pointController,
+            keyboardType: TextInputType.phone,
+            decoration: const InputDecoration(
+                hintText: "Points", border: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.kGreen),
+                borderRadius: BorderRadius.all(Radius.circular(32)))),
+          ),
+        ) : SizedBox(),
+
       ],
     );
   }
@@ -405,7 +425,8 @@ class _CreateSalesState extends State<CreateSales> {
       "code": _codeController.text.trim(),
       "amount": _amountController.text.trim(),
       "description": _descController.text.trim(),
-      "pt_flag": "$switchVal"
+      "pt_flag": "$switchVal",
+      "pt_amount": _pointController.text
     };
 
     final response =
@@ -481,6 +502,7 @@ class _CreateSalesState extends State<CreateSales> {
         context: context,
         builder: (BuildContext bc) {
           return Container(
+            height: getScreenSize(context: context).height / 2 + 200,
             child: Column(
               children: <Widget>[
                 Container(

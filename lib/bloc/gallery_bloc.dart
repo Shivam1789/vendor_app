@@ -6,6 +6,7 @@ import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:vendor_flutter/Utils/Messages.dart';
 import 'package:vendor_flutter/Utils/ReusableComponents/customLoader.dart';
+import 'package:vendor_flutter/Utils/ReusableWidgets.dart';
 import 'package:vendor_flutter/Utils/UniversalFunctions.dart';
 import 'package:vendor_flutter/Utils/memory_management.dart';
 import 'package:vendor_flutter/data/ImageList.dart';
@@ -126,19 +127,8 @@ class GalleryBloc extends BaseBloc {
     print("UPLOADED");
     print("STATUS CODE: ${response.statusCode}");
     _customLoader.hideLoader();
-//    showAlertDialog(
-//        context: context,
-//        title: "Information",
-//        message: "Image uploaded succesfully.");
-    Fluttertoast.showToast(
-        msg: "Image uploaded Successfully.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIos: 1,
-        backgroundColor: Colors.black87,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
+
+    getToast(msg: "Image uploaded Successfully.");
     return response;
   }
 }
