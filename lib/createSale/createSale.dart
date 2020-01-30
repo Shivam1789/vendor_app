@@ -291,11 +291,6 @@ class _CreateSalesState extends State<CreateSales> {
       titleText: "CREATE SALES",
       onPressed: () {
         closeKeyboard(context: context, onClose: () {});
-        if (_codeController.text.isEmpty) {
-          _availablePoints = "";
-          setState(() {});
-        }
-        
         if (_FormKey.currentState.validate()) {
           _salesDetail();
         }
@@ -439,7 +434,10 @@ class _CreateSalesState extends State<CreateSales> {
       _amountController.clear();
       _codeController.clear();
       _descController.clear();
+      _pointController.clear();
       _customLoader.hideLoader();
+      _availablePoints = "";
+      setState(() {});
       getToast(msg: msg);
       setState(() {
       });
@@ -475,10 +473,11 @@ class _CreateSalesState extends State<CreateSales> {
     }
     _customLoader.showLoader(context);
     var switchVal = switchOn ? 1 : 0;
+    
     String url = "${ApiUrl.baseUrl}sale?token=${MemoryManagement
         .getAccessToken()}&code=${_codeController
         .text}&amount=${_amountController.text}&description=${_descController
-        .text}&pt_flag=$switchVal ";
+        .text}&pt_flag=$switchVal&pt_amount=${_pointController.text.trim()} ";
     print(url);
     var result =
     await http.get(url, headers: {"Accept": "application/json"});
