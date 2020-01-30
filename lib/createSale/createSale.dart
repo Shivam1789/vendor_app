@@ -473,7 +473,7 @@ class _CreateSalesState extends State<CreateSales> {
     }
     _customLoader.showLoader(context);
     var switchVal = switchOn ? 1 : 0;
-    
+
     String url = "${ApiUrl.baseUrl}sale?token=${MemoryManagement
         .getAccessToken()}&code=${_codeController
         .text}&amount=${_amountController.text}&description=${_descController
