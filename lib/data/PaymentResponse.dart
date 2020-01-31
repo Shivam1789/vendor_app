@@ -27,7 +27,7 @@ class PaymentResponse {
 class Result {
   int id;
   int userId;
-  int amount;
+  num amount;
   String description;
   int status;
   String createdAt;
